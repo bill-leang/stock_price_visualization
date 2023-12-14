@@ -1,0 +1,7 @@
+.custom-jumbotron {
+    background-color: lightblue;
+}
+
+.panel-primary > .panel-heading{
+    background-color: lightblue;
+}
