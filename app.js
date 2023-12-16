@@ -1,3 +1,11 @@
+/*
+ Plotting price charts
+ Given the json data from API plot the price chart.
+ Data processing: default: show all the data range available.
+   Allow user to Apply a date range, show only the selected range.
+Trace properties: x: date, y: close price
+*/
+
 //Plot from CSV file
 function plotChart(data){
     var dates = data.map(function(record){return record.Date;});
@@ -39,7 +47,7 @@ fetch('./data/aapl.json')
 window.onresize = function () {
     plotData(stockData);
 }
-
+//plotting candlestick chart
 function plotData(stockData) {
     var dates = stockData.map(record => record.Date);
     var openingprices = stockData.map( record => record.Open);
@@ -49,6 +57,7 @@ function plotData(stockData) {
     
     var trace = {
         x: dates,
+        //instead of a y value, it defines the candlestick
         close: closingPrices,
         decreasing: {line: {color: 'red'}},
         high: highPrices,
