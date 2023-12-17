@@ -6,7 +6,121 @@
 Trace properties: x: date, y: close price
 */
 
-//Plot from CSV file
+/*
+ToDo:
+- Display only the Name in the dropdown
+- From the name, use stocklistData to get the ticker
+- use the ticker to load the json file
+*/
+
+
+// // Read CSV file
+// Papa.parse("./data/AAPL.csv", {
+//   download: true,
+//   header: true,
+//   complete: function(results) {
+//     plotChart(results.data);
+//   }
+// });
+
+//get the data from json file
+// store in stockData
+// call plotData(stockData)
+// call plotChart(stockData)
+
+//Plot from json, to be replaced with call to Flask
+
+// get json file with fetch
+// fetch('./data/aapl.json')
+//   .then(response => response.json())
+//   .then(data => {plotChart(data); plotData(data);})
+//   .catch(error => console.log(error));
+let jsonData = null;
+let stocklistData = null;
+
+//get list of stocks, load into dropdown
+d3.json("./data/stocklist.json").then(function(data) {
+    //Store the data from the json file
+    stocklistData = data;
+    console.log('stocklistData:',stocklistData);
+    //populate dropdown with stock list
+    var dropdown = d3.select("#selDataset");
+    //remove existing options
+    dropdown.selectAll('option').remove()
+
+  
+
+    //add names array as options in dropdown menu
+    dropdown.selectAll('option')
+        .data(data)
+        .enter()
+        .append('option')
+        .attr('value', function(d){return d.Name ;})
+        .text(function(d){ return d.Name ;});
+    
+      // add a default message
+      dropdown.insert('option', ':first-child')
+      .attr('value', '')
+      .text("Select a stock")
+
+  }).catch(function(error) {
+    console.log(error); 
+    });
+
+
+
+console.log('jsonData:',jsonData);
+
+
+
+function optionChanged(selected){
+
+   var selectedTicker  = selected.value;
+
+   console.log('selected:',selectedTicker);
+   ticker = getTicker(selectedTicker, stocklistData);
+   //get the selected stock from dropdown
+    d3.json("./data/" + ticker + ".json").then(function(data) {
+    //Store the data from the json file
+    jsonData = data;
+       
+    //fill in Stock info
+    //get the required info from stocklistData array
+    let stockInfo = getStockInfo(selectedTicker, stocklistData);
+    // convert the object to formatted string using map 
+    formattedPI = Object.keys(stockInfo).map(key => key + ': ' + stockInfo[key] + '<br/>').join('')
+    // need to use .html() instead of .text() to display the <br> correctly
+    d3.select("#sample-metadata").html(formattedPI)
+    
+    plotChart(data);
+    plotData(data);
+  }).catch(function(error) {
+    console.log(error);
+  });
+}
+
+//helper function
+//get the ticker from the stocklist given the name
+function getTicker(name, array) {
+    for (let i = 0; i < array.length; i++) {
+        if (array[i].Name === name) {
+            return array[i].Ticker;
+        }
+    }
+    return null;
+}
+
+//get the ticker from the stocklist given the name
+function getStockInfo(name, array) {
+    for (let i = 0; i < array.length; i++) {
+        if (array[i].Name === name) {
+            return array[i];
+        }
+    }
+    return null;
+}
+
+// plot the line chart
 function plotChart(data){
     var dates = data.map(function(record){return record.Date;});
     var prices = data.map(function(record){ return record.Close;});
@@ -16,7 +130,9 @@ function plotChart(data){
         x: dates,
         y: prices,
         type: 'scatter',
-        mode: 'lines+markers',
+        // line mode gives a finer line
+        // mode: 'lines+markers',
+        mode: 'lines',
         marker: {color: 'blue'},
     };
 
@@ -25,27 +141,12 @@ function plotChart(data){
         xaxis: { title: 'Date'},
         yaxis: {title: 'Price'}
     };
-    Plotly.newPlot('stock-chart', [stockData], layout);
+    Plotly.newPlot('stock-chart', [stockData], layout, {scrollZoom: true});
 }
 
-// Read CSV file
-Papa.parse("./data/AAPL.csv", {
-  download: true,
-  header: true,
-  complete: function(results) {
-    plotChart(results.data);
-  }
-});
-
-//Plot from json, to be replaced with call to Flask
-fetch('./data/aapl.json')
-  .then(response => response.json())
-  .then(data => plotData(data))
-  .catch(error => console.log(error));
-
   //make the chart fullscreen
-window.onresize = function () {
-    plotData(stockData);
+  window.onresize = function () {
+    plotData(jsonData);
 }
 //plotting candlestick chart
 function plotData(stockData) {
@@ -92,10 +193,9 @@ function plotData(stockData) {
         plot_bgcolor: '#f3f3f3',
     };
 
-    Plotly.newPlot('stock-chart2', [trace], layout);
+    Plotly.newPlot('stock-chart2', [trace], layout, {scrollZoom: true});
 
 }
-
 
 // const url = "https://2u-data-curriculum-team.s3.amazonaws.com/dataviz-classroom/v1.1/14-Interactive-Web-Visualizations/02-Homework/samples.json";
 // // const url = "https://2u-data-curriculum-team.s3.amazonaws.com/dataviz-classroom/v1.1/14-Interactive-Web-Visualizations/02-Homework/samples2.json";
