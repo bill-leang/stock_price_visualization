@@ -37,6 +37,8 @@ ToDo:
 //   .catch(error => console.log(error));
 let jsonData = null;
 let stocklistData = null;
+let ticker = null;
+let stockName = null;
 
 //get list of stocks, load into dropdown
 d3.json("./data/stocklist.json").then(function(data) {
@@ -76,7 +78,7 @@ console.log('jsonData:',jsonData);
 function optionChanged(selected){
 
    var selectedTicker  = selected.value;
-
+   stockName = selectedTicker;
    console.log('selected:',selectedTicker);
    ticker = getTicker(selectedTicker, stocklistData);
    //get the selected stock from dropdown
@@ -88,7 +90,7 @@ function optionChanged(selected){
     //get the required info from stocklistData array
     let stockInfo = getStockInfo(selectedTicker, stocklistData);
     // convert the object to formatted string using map 
-    formattedPI = Object.keys(stockInfo).map(key => key + ': ' + stockInfo[key] + '<br/>').join('')
+    formattedPI = Object.keys(stockInfo).map(key => key + ': <strong>' + stockInfo[key] + '</strong><br/>').join('')
     // need to use .html() instead of .text() to display the <br> correctly
     d3.select("#sample-metadata").html(formattedPI)
     
@@ -97,6 +99,44 @@ function optionChanged(selected){
   }).catch(function(error) {
     console.log(error);
   });
+}
+
+function updateChart() {
+    var startDate = new Date(document.getElementById('start-date').value);
+    var endDate = new Date(document.getElementById('end-date').value);
+    console.log('startDate:', startDate);
+    console.log('endDate:', endDate);
+
+    var filteredData = jsonData.filter(function(d) {
+                var date = new Date(d.Date);
+                console.log('Data date:', date);
+                return date >= startDate && date <= endDate;
+            });
+    
+    console.log('filteredData:',filteredData);
+    
+    // Use the filtered data to plot the chart
+    plotChart(filteredData);
+    plotData(filteredData);
+
+    // d3.json("./data/" + ticker + ".json").then(function(data) {
+    //     console.log("Loaded data:", data);
+
+    //     // Filter the data based on the selected dates
+    //     var filteredData = data.filter(function(d) {
+    //         var date = new Date(d.Date);
+    //         console.log('Data date:', date);
+    //         return date >= startDate && date <= endDate;
+    //     });
+
+    //     console.log('filteredData:',filteredData);
+
+    //     // Use the filtered data to plot the chart
+    //     plotChart(filteredData);
+    //     plotData(filteredData);
+    // }).catch(function(error) {
+    //     console.log(error);
+    // });
 }
 
 //helper function
@@ -137,7 +177,7 @@ function plotChart(data){
     };
 
     var layout = {
-        title: 'Captivating Stock Price Chart',
+        title: stockName + ' Stock Price Chart',
         xaxis: { title: 'Date'},
         yaxis: {title: 'Price'}
     };
@@ -178,7 +218,7 @@ function plotData(stockData) {
     };
 
     var layout ={
-        title: 'Exquisite Stock Price Chart',
+        title: stockName + ' Candlestick Chart',
         xaxis: {
             title: 'Date',
             type: 'category',

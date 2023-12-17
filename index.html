@@ -20,36 +20,55 @@
       </div>
     </div>
     <div class="row">
-      <div class="col-md-4">
+      <div class="col-md-3">
         <div class="well custom-jumbotron">
-          <h5>Stock Ticker:</h5>
+          <h3 class="panel-title">Stock Ticker:</h3>
           <select id="selDataset" onchange="optionChanged(this)">
           <!-- default message-->
           <option value="" disabled selected>Select a ticker</option>
           </select>
         </div>
-      <div class="col-md-8">
-        <div class="panel panel-primary">
-          <div class="panel-heading  ">
-            <h3 class="panel-title">Stock Info</h3>
-          </div>
-          <div id="sample-metadata" class="panel-body">...</div>
-        </div>
-       </div>    
       </div>
-      
-      <div class="col-md-5">
+        <!--select dates -->
+      <div class="col-md-2">
+        <label for="start-date">Start Date:</label>
+        <input type="date" id="start-date">
+      </div>
+    
+      <div class="col-md-2">
+        <label for="end-date">End Date:</label>
+        <input type="date" id="end-date">
+      </div>
+    
+      <div class="col-md-2">
+        <button onclick="updateChart()" class="btn btn-primary">Update Chart</button>
+      </div>
+      <!-- <div class="col-md-5">
         <div id="bar"></div>
-      </div>
+      </div> -->
       <!--
       <div class="col-md-5">
         <div id="gauge"></div>
       </div> -->
     </div>
+
     <div class="row">
-        <div class="col-md-12">
-          <div id="stock-chart"></div>
+      <div class="col-md-3">
+        <div class="panel panel-primary">
+        <div class="panel-heading  ">
+          <h3 class="panel-title">Stock Info</h3>
         </div>
+        <div id="sample-metadata" class="panel-body">...</div>
+      </div>
+     </div>    
+     <div class="col-md-9">
+      <div id="stock-chart"></div>
+     </div>
+    </div>
+   
+  
+  <div class="row">
+        
     </div>
     <div class="row">
         <div class="col-md-12">
@@ -57,11 +76,11 @@
         </div>
     </div>
  
-    <div class="row">
+    <!-- <div class="row">
       <div class="col-md-12">
         <div id="bubble"></div>
       </div>
-    </div>
+    </div> -->
   </div>
   
   <script src="https://d3js.org/d3.v7.min.js"></script>
