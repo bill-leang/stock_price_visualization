@@ -1,4 +1,218 @@
-//Plot from CSV file
+/*
+ Plotting price charts
+ Given the json data from API plot the price chart.
+ Data processing: default: show all the data range available.
+   Allow user to Apply a date range, show only the selected range.
+Trace properties: x: date, y: close price
+*/
+
+/*
+ToDo:
+- Display only the Name in the dropdown
+- From the name, use stocklistData to get the ticker
+- use the ticker to load the json file
+*/
+
+
+// // Read CSV file
+// Papa.parse("./data/AAPL.csv", {
+//   download: true,
+//   header: true,
+//   complete: function(results) {
+//     plotChart(results.data);
+//   }
+// });
+
+//get the data from json file
+// store in stockData
+// call plotData(stockData)
+// call plotChart(stockData)
+
+//Plot from json, to be replaced with call to Flask
+
+// get json file with fetch
+// fetch('./data/aapl.json')
+//   .then(response => response.json())
+//   .then(data => {plotChart(data); plotData(data);})
+//   .catch(error => console.log(error));
+let jsonData = null;
+let stocklistData = null;
+let ticker = null;
+let stockName = null;
+let stockNames = null;
+
+//get list of stocks, load into dropdown
+// d3.json("localhost:8080/api/v1.0/stockinfo").then(function(data) {
+d3.json("./data/stocklist.json").then(function(data) {
+    //Store the data from the json file
+    stocklistData = data;
+    console.log('stocklistData:',stocklistData);
+    //populate dropdown with stock list
+    var dropdown = d3.select("#selDataset");
+    //remove existing options
+    dropdown.selectAll('option').remove()
+
+  
+
+    //add names array as options in dropdown menu
+    dropdown.selectAll('option')
+        .data(data)
+        .enter()
+        .append('option')
+        .attr('value', function(d){return d.Name ;})
+        .text(function(d){ return d.Name ;});
+    
+      // add a default message
+      dropdown.insert('option', ':first-child')
+      .attr('value', '')
+      .text("Select a stock")
+
+      //populate dropdown in tab2 with stock list
+      var dropdown2 = d3.select("#selDataset2");
+      dropdown2.attr('multiple', '');
+      dropdown2.selectAll('option').remove()
+      dropdown2.selectAll('option')
+        .data(data)
+        .enter()
+        .append('option')
+        .attr('value', function(d){return d.Name ;})
+        .text(function(d){ return d.Name ;});
+
+  }).catch(function(error) {
+    console.log(error); 
+    });
+
+
+
+console.log('jsonData:',jsonData);
+
+function optionAdded(selectElelement){
+  var selectedStocks = Array.from(selectElelement.selectedOptions).map(option => option.value);
+  console.log("Selected stocks:", selectedStocks);
+  stockNames = selectedStocks; 
+  //get the selected stocks' price data
+    var dataPromises = selectedStocks.map(stockname => {
+        var stockTicker = getTicker(stockname, stocklistData);
+        return d3.json("./data/" + stockTicker + ".json");
+    });
+    
+    Promise.all(dataPromises).then(function(stocksData){
+        console.log('stocksData:',stocksData);
+        plotMultiCharts(stocksData);
+    }).catch(function(error) {
+        console.log(error);
+    });
+}
+
+function optionChanged(selected){
+
+   var selectedTicker  = selected.value;
+   stockName = selectedTicker;
+   console.log('selected:',selectedTicker);
+   ticker = getTicker(selectedTicker, stocklistData);
+   //get the selected stock from dropdown
+    d3.json("./data/" + ticker + ".json").then(function(data) {
+    //Store the data from the json file
+    jsonData = data;
+       
+    //fill in Stock info
+    //get the required info from stocklistData array
+    let stockInfo = getStockInfo(selectedTicker, stocklistData);
+    // convert the object to formatted string using map 
+    formattedPI = Object.keys(stockInfo).map(key => key + ': <strong>' + stockInfo[key] + '</strong><br/>').join('')
+    // need to use .html() instead of .text() to display the <br> correctly
+    d3.select("#sample-metadata").html(formattedPI)
+    
+    plotChart(data);
+    plotData(data);
+  }).catch(function(error) {
+    console.log(error);
+  });
+}
+
+function updateChart() {
+    var startDate = new Date(document.getElementById('start-date').value);
+    var endDate = new Date(document.getElementById('end-date').value);
+    console.log('startDate:', startDate);
+    console.log('endDate:', endDate);
+
+    var filteredData = jsonData.filter(function(d) {
+                var date = new Date(d.Date);
+                console.log('Data date:', date);
+                return date >= startDate && date <= endDate;
+            });
+    
+    console.log('filteredData:',filteredData);
+    
+    // Use the filtered data to plot the chart
+    plotChart(filteredData);
+    plotData(filteredData);
+
+    // d3.json("./data/" + ticker + ".json").then(function(data) {
+    //     console.log("Loaded data:", data);
+
+    //     // Filter the data based on the selected dates
+    //     var filteredData = data.filter(function(d) {
+    //         var date = new Date(d.Date);
+    //         console.log('Data date:', date);
+    //         return date >= startDate && date <= endDate;
+    //     });
+
+    //     console.log('filteredData:',filteredData);
+
+    //     // Use the filtered data to plot the chart
+    //     plotChart(filteredData);
+    //     plotData(filteredData);
+    // }).catch(function(error) {
+    //     console.log(error);
+    // });
+}
+
+//helper function
+//get the ticker from the stocklist given the name
+function getTicker(name, array) {
+    for (let i = 0; i < array.length; i++) {
+        if (array[i].Name === name) {
+            return array[i].Ticker;
+        }
+    }
+    return null;
+}
+
+//get the ticker from the stocklist given the name
+function getStockInfo(name, array) {
+    for (let i = 0; i < array.length; i++) {
+        if (array[i].Name === name) {
+            return array[i];
+        }
+    }
+    return null;
+}
+
+//plot an array of charts
+function plotMultiCharts(stocksData){
+    var colors = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet'];
+    var data = stocksData.map((stockData,i) => {
+        return {
+            x: stockData.map(record => record.Date),
+            y: stockData.map(record => record.Close),
+            type: 'scatter',
+            mode: 'lines',
+            name: stockNames[i],
+            marker: {color: colors[i% colors.length]},
+        };
+    });
+    var layout = {
+        title: 'Stock Prices',
+        xaxis: { title: 'Date'},
+        yaxis: {title: 'Price'},
+        width: 1000,
+        height: 800
+    };
+    Plotly.newPlot('compareChart', data, layout, {scrollZoom: true});
+}
+
+// plot the line chart
 function plotChart(data){
     var dates = data.map(function(record){return record.Date;});
     var prices = data.map(function(record){ return record.Close;});
@@ -8,38 +222,25 @@ function plotChart(data){
         x: dates,
         y: prices,
         type: 'scatter',
-        mode: 'lines+markers',
+        // line mode gives a finer line
+        // mode: 'lines+markers',
+        mode: 'lines',
         marker: {color: 'blue'},
     };
 
     var layout = {
-        title: 'Captivating Stock Price Chart',
+        title: stockName + ' Stock Price Chart',
         xaxis: { title: 'Date'},
         yaxis: {title: 'Price'}
     };
-    Plotly.newPlot('stock-chart', [stockData], layout);
+    Plotly.newPlot('stock-chart', [stockData], layout, {scrollZoom: true});
 }
-
-// Read CSV file
-Papa.parse("./data/AAPL.csv", {
-  download: true,
-  header: true,
-  complete: function(results) {
-    plotChart(results.data);
-  }
-});
-
-//Plot from json, to be replaced with call to Flask
-fetch('./data/aapl.json')
-  .then(response => response.json())
-  .then(data => plotData(data))
-  .catch(error => console.log(error));
 
   //make the chart fullscreen
-window.onresize = function () {
-    plotData(stockData);
+  window.onresize = function () {
+    plotData(jsonData);
 }
-
+//plotting candlestick chart
 function plotData(stockData) {
     var dates = stockData.map(record => record.Date);
     var openingprices = stockData.map( record => record.Open);
@@ -49,6 +250,7 @@ function plotData(stockData) {
     
     var trace = {
         x: dates,
+        //instead of a y value, it defines the candlestick
         close: closingPrices,
         decreasing: {line: {color: 'red'}},
         high: highPrices,
@@ -68,7 +270,7 @@ function plotData(stockData) {
     };
 
     var layout ={
-        title: 'Exquisite Stock Price Chart',
+        title: stockName + ' Candlestick Chart',
         xaxis: {
             title: 'Date',
             type: 'category',
@@ -83,10 +285,9 @@ function plotData(stockData) {
         plot_bgcolor: '#f3f3f3',
     };
 
-    Plotly.newPlot('stock-chart2', [trace], layout);
+    Plotly.newPlot('stock-chart2', [trace], layout, {scrollZoom: true});
 
 }
-
 
 // const url = "https://2u-data-curriculum-team.s3.amazonaws.com/dataviz-classroom/v1.1/14-Interactive-Web-Visualizations/02-Homework/samples.json";
 // // const url = "https://2u-data-curriculum-team.s3.amazonaws.com/dataviz-classroom/v1.1/14-Interactive-Web-Visualizations/02-Homework/samples2.json";
