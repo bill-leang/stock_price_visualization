@@ -42,6 +42,7 @@ let stockName = null;
 let stockNames = null;
 
 //get list of stocks, load into dropdown
+// d3.json("localhost:8080/api/v1.0/stockinfo").then(function(data) {
 d3.json("./data/stocklist.json").then(function(data) {
     //Store the data from the json file
     stocklistData = data;
