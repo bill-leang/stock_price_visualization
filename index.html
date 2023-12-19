@@ -5,12 +5,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Project 3</title>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <title>Project 3 Stock Analysis</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> -->
   <link rel="stylesheet" href="./custom.css">
 </head>
 
 <body>
+
 
   <div class="container">
     <div class="row">
@@ -19,77 +21,123 @@
         <p>Use the interactive charts below to explore the dataset</p>
       </div>
     </div>
+
+  <!-- Creating two tabs -->
+<div class="container">
+  <ul class="nav nav-tabs">
+    <li class="nav-item">
+      <a class="nav-link active" data-toggle="tab" href="#stockInfo">Stock Info</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-toggle="tab" href="#compareStocks">Compare Stocks</a>
+    </li>
+  </ul>
+
+  <div class="tab-content">
+    <div id="stockInfo" class="tab-pane active">
+
+      <div class="row">
+        <div class="col-md-3">
+          <div class="well custom-jumbotron">
+            <h3 class="panel-title">Stock Ticker:</h3>
+            <select id="selDataset" onchange="optionChanged(this)">
+            <!-- default message-->
+            <option value="" disabled selected>Select a ticker</option>
+            </select>
+          </div>
+        </div>
+          <!--select dates -->
+        <div class="col-md-2">
+          <label for="start-date">Start Date:</label>
+          <input type="date" id="start-date">
+        </div>
+      
+        <div class="col-md-2">
+          <label for="end-date">End Date:</label>
+          <input type="date" id="end-date">
+        </div>
+      
+        <div class="col-md-2">
+          <button onclick="updateChart()" class="btn btn-primary">Update Chart</button>
+        </div>
+        <!-- <div class="col-md-5">
+          <div id="bar"></div>
+        </div> -->
+        <!--
+        <div class="col-md-5">
+          <div id="gauge"></div>
+        </div> -->
+      </div>
+  
+      <div class="row">
+        <div class="col-md-3">
+          <div class="panel panel-primary">
+          <div class="panel-heading  ">
+            <h3 class="panel-title">Stock Info</h3>
+          </div>
+          <div id="sample-metadata" class="panel-body">...</div>
+        </div>
+       </div>    
+       <div class="col-md-9">
+        <div id="stock-chart"></div>
+       </div>
+      </div>
+     
+    
     <div class="row">
-      <div class="col-md-3">
-        <div class="well custom-jumbotron">
-          <h3 class="panel-title">Stock Ticker:</h3>
-          <select id="selDataset" onchange="optionChanged(this)">
-          <!-- default message-->
-          <option value="" disabled selected>Select a ticker</option>
-          </select>
+          
+      </div>
+      <div class="row">
+          <div class="col-md-12">
+            <div id="stock-chart2"></div>
+          </div>
+      </div>
+   
+      <!-- <div class="row">
+        <div class="col-md-12">
+          <div id="bubble"></div>
+        </div>
+      </div> -->
+    </div>
+  
+    <div id="compareStocks" class="tab-pane fade">
+      <!-- New tab content goes here -->
+     
+      <div class="row">
+        <div class="col-md-3">
+          <div class="well custom-jumbotron">
+            <h3 class="panel-title">Ctl+Click to Add Stock:</h3>
+            <select id="selDataset2" onchange="optionAdded(this)">
+            <!-- default message-->
+            <option value="" disabled selected>Add a ticker</option>
+            </select>
+          </div>
         </div>
       </div>
-        <!--select dates -->
-      <div class="col-md-2">
-        <label for="start-date">Start Date:</label>
-        <input type="date" id="start-date">
+      
+      <div class="col-md-15">
+        <div id="compareChart"></div>
       </div>
-    
-      <div class="col-md-2">
-        <label for="end-date">End Date:</label>
-        <input type="date" id="end-date">
-      </div>
-    
-      <div class="col-md-2">
-        <button onclick="updateChart()" class="btn btn-primary">Update Chart</button>
-      </div>
-      <!-- <div class="col-md-5">
-        <div id="bar"></div>
-      </div> -->
-      <!--
-      <div class="col-md-5">
-        <div id="gauge"></div>
-      </div> -->
     </div>
 
-    <div class="row">
-      <div class="col-md-3">
-        <div class="panel panel-primary">
-        <div class="panel-heading  ">
-          <h3 class="panel-title">Stock Info</h3>
-        </div>
-        <div id="sample-metadata" class="panel-body">...</div>
-      </div>
-     </div>    
-     <div class="col-md-9">
-      <div id="stock-chart"></div>
-     </div>
-    </div>
-   
-  
-  <div class="row">
-        
-    </div>
-    <div class="row">
-        <div class="col-md-12">
-          <div id="stock-chart2"></div>
-        </div>
-    </div>
- 
-    <!-- <div class="row">
-      <div class="col-md-12">
-        <div id="bubble"></div>
-      </div>
-    </div> -->
   </div>
+
+    
+  
+</div>
+<!-- End of new tab code -->
+
+    
   
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.0.2/papaparse.min.js"></script>
 
   <script src="./app.js"></script>
-  <!-- <script src="./newtest.js"></script> -->
 
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 </body>
 
 </html>

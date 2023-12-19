@@ -39,6 +39,7 @@ let jsonData = null;
 let stocklistData = null;
 let ticker = null;
 let stockName = null;
+let stockNames = null;
 
 //get list of stocks, load into dropdown
 d3.json("./data/stocklist.json").then(function(data) {
@@ -65,6 +66,17 @@ d3.json("./data/stocklist.json").then(function(data) {
       .attr('value', '')
       .text("Select a stock")
 
+      //populate dropdown in tab2 with stock list
+      var dropdown2 = d3.select("#selDataset2");
+      dropdown2.attr('multiple', '');
+      dropdown2.selectAll('option').remove()
+      dropdown2.selectAll('option')
+        .data(data)
+        .enter()
+        .append('option')
+        .attr('value', function(d){return d.Name ;})
+        .text(function(d){ return d.Name ;});
+
   }).catch(function(error) {
     console.log(error); 
     });
@@ -73,7 +85,23 @@ d3.json("./data/stocklist.json").then(function(data) {
 
 console.log('jsonData:',jsonData);
 
-
+function optionAdded(selectElelement){
+  var selectedStocks = Array.from(selectElelement.selectedOptions).map(option => option.value);
+  console.log("Selected stocks:", selectedStocks);
+  stockNames = selectedStocks; 
+  //get the selected stocks' price data
+    var dataPromises = selectedStocks.map(stockname => {
+        var stockTicker = getTicker(stockname, stocklistData);
+        return d3.json("./data/" + stockTicker + ".json");
+    });
+    
+    Promise.all(dataPromises).then(function(stocksData){
+        console.log('stocksData:',stocksData);
+        plotMultiCharts(stocksData);
+    }).catch(function(error) {
+        console.log(error);
+    });
+}
 
 function optionChanged(selected){
 
@@ -158,6 +186,29 @@ function getStockInfo(name, array) {
         }
     }
     return null;
+}
+
+//plot an array of charts
+function plotMultiCharts(stocksData){
+    var colors = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet'];
+    var data = stocksData.map((stockData,i) => {
+        return {
+            x: stockData.map(record => record.Date),
+            y: stockData.map(record => record.Close),
+            type: 'scatter',
+            mode: 'lines',
+            name: stockNames[i],
+            marker: {color: colors[i% colors.length]},
+        };
+    });
+    var layout = {
+        title: 'Stock Prices',
+        xaxis: { title: 'Date'},
+        yaxis: {title: 'Price'},
+        width: 1000,
+        height: 800
+    };
+    Plotly.newPlot('compareChart', data, layout, {scrollZoom: true});
 }
 
 // plot the line chart

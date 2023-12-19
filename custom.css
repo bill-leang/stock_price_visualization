@@ -5,3 +5,8 @@
 .panel-primary > .panel-heading{
     background-color: lightblue;
 }
+
+#compareChart {
+    width: 100%;
+    height: 800px;
+}
