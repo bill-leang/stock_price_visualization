@@ -10,3 +10,14 @@ data/AAPL.csv
 data/AAPL.csv
 data/AAPL2.csv
 test.js
+app_befordDateChg.js
+node_modules/.bin/mime
+node_modules/.bin/mime.cmd
+node_modules/.bin/mime.ps1
+node_modules/.package-lock.json
+node_modules/accepts/index.js
+node_modules/accepts/HISTORY.md
+node_modules/accepts/LICENSE
+node_modules/*
+package.json
+package-lock.json

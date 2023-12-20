@@ -40,9 +40,11 @@ let stocklistData = null;
 let ticker = null;
 let stockName = null;
 let stockNames = null;
+const cloudbased = true;
 
 //get list of stocks, load into dropdown
 // d3.json("localhost:8080/api/v1.0/stockinfo").then(function(data) {
+
 d3.json("./data/stocklist.json").then(function(data) {
     //Store the data from the json file
     stocklistData = data;
@@ -92,12 +94,30 @@ function optionAdded(selectElelement){
   stockNames = selectedStocks; 
   //get the selected stocks' price data
     var dataPromises = selectedStocks.map(stockname => {
-        var stockTicker = getTicker(stockname, stocklistData);
-        return d3.json("./data/" + stockTicker + ".json");
+        let ticker = getTicker(stockname, stocklistData);
+        // using ternary operator, check if cloudbased is true use url, otherwise use local json
+        let datasource = cloudbased ? ("http://localhost:5000/api/v1.0/price/" + ticker) : ("./data/" + ticker + ".json");
+      
+        //this is a data promise not an array yet   
+        return d3.json(datasource);
+     
     });
     
     Promise.all(dataPromises).then(function(stocksData){
         console.log('stocksData:',stocksData);
+        //format the dateStr in the array into JS date
+        if (cloudbased) {
+        for (i=0; i< stocksData.length; i++){
+           
+                stocksData[i] = stocksData[i].map(record => {
+                    return {
+                        ...record,
+                        date: getJSDate(record.date)
+                    };
+                });
+            }
+        }
+
         plotMultiCharts(stocksData);
     }).catch(function(error) {
         console.log(error);
@@ -106,15 +126,31 @@ function optionAdded(selectElelement){
 
 function optionChanged(selected){
 
-   var selectedTicker  = selected.value;
+   let selectedTicker  = selected.value;
    stockName = selectedTicker;
    console.log('selected:',selectedTicker);
    ticker = getTicker(selectedTicker, stocklistData);
    //get the selected stock from dropdown
-    d3.json("./data/" + ticker + ".json").then(function(data) {
+     
+    // d3.json("./data/" + ticker + ".json").then(function(data) {
+    let datasource = cloudbased ? ("http://localhost:5000/api/v1.0/price/" + ticker) : ("./data/" + ticker + ".json");
+    console.log("datasource: ", datasource);
+    d3.json(datasource).then(function(data) {
     //Store the data from the json file
+    if (cloudbased) {
+        data = data.map(record => {
+            return {
+                ...record,
+                date: getJSDate(record.date)
+            };
+        });
+    }
+    // else {
+    //     var date = new Date(d.Date);
+    // }
+    // console.log(data.date)
     jsonData = data;
-       
+    // console.log("after mapping, jsonData: ", jsonData)   
     //fill in Stock info
     //get the required info from stocklistData array
     let stockInfo = getStockInfo(selectedTicker, stocklistData);
@@ -123,8 +159,9 @@ function optionChanged(selected){
     // need to use .html() instead of .text() to display the <br> correctly
     d3.select("#sample-metadata").html(formattedPI)
     
-    plotChart(data);
-    plotData(data);
+    plotChart(jsonData);
+    console.log("before calling candlestick, jsonData: ", jsonData)   
+    plotData(jsonData);
   }).catch(function(error) {
     console.log(error);
   });
@@ -137,8 +174,14 @@ function updateChart() {
     console.log('endDate:', endDate);
 
     var filteredData = jsonData.filter(function(d) {
-                var date = new Date(d.Date);
-                console.log('Data date:', date);
+                var date = cloudbased? new Date(d.date) : new Date(d.Date);
+                // if (cloudbased) {
+                //     var date = getJSDate(d.date);    
+                // }
+                // else {
+                //     var date = new Date(d.Date);
+                // }
+                // console.log('Data date:', date);
                 return date >= startDate && date <= endDate;
             });
     
@@ -168,7 +211,13 @@ function updateChart() {
     // });
 }
 
-//helper function
+//helper functions
+
+//return date 'yyyy-mm-dd' from 'dd/mm/yyyy'
+function getJSDate(dateStr) {
+    let [day, month, year] = dateStr.split('/');
+    return new Date(`${year}-${month}-${day}`);
+}
 //get the ticker from the stocklist given the name
 function getTicker(name, array) {
     for (let i = 0; i < array.length; i++) {
@@ -194,8 +243,10 @@ function plotMultiCharts(stocksData){
     var colors = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet'];
     var data = stocksData.map((stockData,i) => {
         return {
-            x: stockData.map(record => record.Date),
-            y: stockData.map(record => record.Close),
+            // x: stockData.map(record => record.Date),
+            // y: stockData.map(record => record.Close),
+            x: cloudbased? stockData.map(record => record.date) : stockData.map(record => record.Date),
+            y: cloudbased? stockData.map(record => record.close) : stockData.map(record => record.Close),
             type: 'scatter',
             mode: 'lines',
             name: stockNames[i],
@@ -214,8 +265,10 @@ function plotMultiCharts(stocksData){
 
 // plot the line chart
 function plotChart(data){
-    var dates = data.map(function(record){return record.Date;});
-    var prices = data.map(function(record){ return record.Close;});
+    // var dates = data.map(function(record){return record.Date;});
+    // var prices = data.map(function(record){ return record.Close;});
+    var dates = cloudbased? data.map(function(record){return record.date}) : data.map(function(record){return record.Date;});
+    var prices = cloudbased? data.map(function(record){return record.close}) : data.map(function(record){ return record.Close;});
     console.log('dates:',dates);
     console.log('prices:',prices);
     var stockData = {
@@ -240,13 +293,21 @@ function plotChart(data){
   window.onresize = function () {
     plotData(jsonData);
 }
+
 //plotting candlestick chart
 function plotData(stockData) {
-    var dates = stockData.map(record => record.Date);
-    var openingprices = stockData.map( record => record.Open);
-    var highPrices = stockData.map( record => record.High);
-    var lowPrices = stockData.map( record => record.Low);
-    var closingPrices = stockData.map( record => record.Close);
+    // var dates = cloudbased? data.map(function(record){return record.date}) : data.map(function(record){return record.Date;});
+    // updated with ternary to accommodate diff in Neon db and json.
+    // console.log("candlestick stockData: ", stockData);
+    var dates = cloudbased? stockData.map(function(record){return record.date}) : stockData.map(function(record){return record.Date});
+    var openingprices = cloudbased? stockData.map(function(record){return record.open}) : stockData.map(function(record){return record.Open});
+    // cloudbased? stockData.map(record.open) : stockData.map( record => record.Open);
+    var highPrices = cloudbased? stockData.map(function(record){return record.high}) : stockData.map(function(record){return record.High});
+    // cloudbased? stockData.map(record.high) : stockData.map( record => record.High);
+    var lowPrices = cloudbased? stockData.map(function(record){return record.low}) : stockData.map(function(record){return record.Low});
+    // cloudbased? stockData.map(record.low) : stockData.map( record => record.Low);
+    var closingPrices = cloudbased? stockData.map(function(record){return record.close}) : stockData.map(function(record){return record.Close});
+    //  cloudbased? stockData.map(record.close) : stockData.map( record => record.Close);
     
     var trace = {
         x: dates,
