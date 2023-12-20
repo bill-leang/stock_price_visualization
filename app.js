@@ -43,9 +43,10 @@ let stockNames = null;
 const cloudbased = true;
 
 //get list of stocks, load into dropdown
-// d3.json("localhost:8080/api/v1.0/stockinfo").then(function(data) {
-
-d3.json("./data/stocklist.json").then(function(data) {
+// using ternary operator, check if cloudbased is true use url, otherwise use local json
+let datasource = cloudbased ? ("http://localhost:5000/api/v1.0/stockinfo") : ("./data/stocklist.json");
+console.log('stockinfo datasource: ', datasource);
+d3.json(datasource).then(function(data) {
     //Store the data from the json file
     stocklistData = data;
     console.log('stocklistData:',stocklistData);

@@ -7,14 +7,8 @@ const app = express();
 
 //enable CORS for all routes
 app.use(cors());
-
+//serve index.html in current directory
 app.use(express.static(path.join(__dirname)));
-
-// app.get('/', (req, res) => {
-//     res.send('Hello, world!');
-// });
-
-
 
 app.listen(8080, () => {
     console.log('Server is running on port 8080');

@@ -7,16 +7,14 @@ from sqlalchemy.ext.automap import automap_base
 from flask_sqlalchemy import SQLAlchemy
 import psycopg2
 from flask_cors import CORS
+import json
 
 
 app = Flask(__name__)
 CORS(app)
-app.config[
-    "SQLALCHEMY_DATABASE_URI" ] = "postgresql://ep-polished-king-27948361.ap-southeast-1.aws.neon.tech:5432/main"
-
+app.config["SQLALCHEMY_DATABASE_URI" ] = "postgresql://ep-polished-king-27948361.ap-southeast-1.aws.neon.tech:5432/main"
 
 db = SQLAlchemy(app)
-
 
 def retrieve_data_from_neon(ticker):
     try:
@@ -64,43 +62,24 @@ def welcome():
     """List all the available routes"""
     return(
         f"Available Routes:<br/>"
-        f"/api/v1.0/AAPL<br/>"
-        f"/api/v1.0/GOOGL<br/>"
-        f"/api/v1.0/AMZN<br/>"
-        f"/api/v1.0/META<br/>"
-        f"/api/v1.0/NFLX<br/>"
-        f"/api/v1.0/MSFT<end>"
+        f"/api/v1.0/price/<ticker><br/>"
+        f"/api/v1.0/stockinfo<br/>"        
     )
 #Will add  the index later 
 
 # return stocklist.json
 @app.route("/api/v1.0/stockinfo")
 def getstockinfo():
-    pass
-    # session = Session(engine)
-    # apple_data= session.query(apple.ticker, apple.date, apple.open, apple.high, apple.low, apple.close, apple.Adjclose, apple.volume).all()
-    # session.close()
-    # jdata = {'ticker': apple_data[0][0], 'date': apple_data[0][1], 'open':round(apple_data[0][2],2), 'high': round(apple_data[0][3],2), 'low': round(apple_data[0][4],2), \
-    #          'close':round(apple_data[0][5],2), 'Adjclose':round(apple_data[0][6],2), 'volume':apple_data[0][7]}
-
-    # return jsonify(jdata)
- #Return the AAPL.Json  
+    with open('./data/stocklist.json') as f:
+        data = json.load(f)
+    return jsonify(data)
+   
 @app.route("/api/v1.0/price/<ticker>")
 def getstockprice(ticker):
    stockdata = retrieve_data_from_neon(ticker)
    print(type(stockdata))
    return jsonify(stockdata)
-   # session = Session(engine)
-    
-    #result = session.query(func.min(Measurement.tobs).label('min_temp'), func.max(Measurement.tobs).label('max_temp'),\
-                        #    func.avg(Measurement.tobs).label('avg_temp')).filter(Measurement.date >= start).all()
-    #session.close()
-    #try:
-       # jdata = {'min_temp': result[0][0], 'max_temp': result[0][1], 'avg_temp':round(result[0][2],2)}
-    # throws error message if invalid date is given
-    #except:
-    #     return f"Invalid data found"
-    # return jsonify(jdata)
+   
 
 
 
