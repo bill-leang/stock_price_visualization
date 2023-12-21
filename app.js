@@ -13,17 +13,7 @@ ToDo:
 - use the ticker to load the json file
 */
 
-
-// // Read CSV file
-// Papa.parse("./data/AAPL.csv", {
-//   download: true,
-//   header: true,
-//   complete: function(results) {
-//     plotChart(results.data);
-//   }
-// });
-
-//get the data from json file
+// get the data from json file
 // store in stockData
 // call plotData(stockData)
 // call plotChart(stockData)
