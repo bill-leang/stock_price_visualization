@@ -114,6 +114,45 @@
         "52 Week High": 320.56,
         "Beta": 1.12,
         "Inst Own": 0.18
+},
+{
+        "Name": "BHP Group Ltd",
+        "Ticker": "BHP",
+        "P/E": 45.67,
+        "Price": 49.73,
+        "Change": -2.67,
+        "Change(%)": -5.21,
+        "Volume": 654321,
+        "YTD Change": 0.18,
+        "Market Cap": 1500.4,
+        "Dividend Yield": 0.0,
+        "ROE": 0.25,
+        "ROA": 0.13,
+        "Debt/Equity": 0.38,
+        "52 Week Low": 2500.34,
+        "52 Week High": 3000.56,
+        "Beta": 1.34,
+        "Inst Own": 0.22
+},
+{
+        "Name": "Woolsworth Group Ltd",
+        "Ticker": "WOW",
+        "P/E": 15.67,
+        "Price": 36.55,
+        "Change": -1.67,
+        "Change(%)": -3.21,
+        "Volume": 654321,
+        "YTD Change": 0.18,
+        "Market Cap": 1500.4,
+        "Dividend Yield": 0.0,
+        "ROE": 0.25,
+        "ROA": 0.13,
+        "Debt/Equity": 0.38,
+        "52 Week Low": 2500.34,
+        "52 Week High": 3000.56,
+        "Beta": 1.34,
+        "Inst Own": 0.22
 }
+
     
 ]

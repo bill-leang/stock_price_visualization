@@ -55,6 +55,45 @@ def retrieve_data_from_neon(ticker):
         print(f"Error retrieving data from PostgreSQL database: {str(e)}")
         return None
     
+def retrieve_stocklist():
+    try:
+        # Establish a connection to the PostgreSQL database
+        connection = psycopg2.connect(
+            host='ep-polished-king-27948361.ap-southeast-1.aws.neon.tech',
+            database='Stock_DB',
+            user='jayaraman.sujatha',
+            password='pd8XBG1ztqrL'
+        )
+
+        # Create a cursor object to execute SQL queries
+        cursor = connection.cursor()
+
+        # Define the SQL query to retrieve data from the "apple" table
+        query = f"SELECT DISTINCT ticker FROM stock_prices"
+
+        # Execute the query
+        cursor.execute(query)
+
+        # Fetch all the rows
+        rows = cursor.fetchall()
+
+        # Get column names
+        column_names = [desc[0] for desc in cursor.description]
+
+        # Convert rows to a list of dictionaries
+        data = [dict(zip(column_names, row)) for row in rows]
+
+        # Close the cursor and connection
+        cursor.close()
+        connection.close()
+
+        return data
+
+    except Exception as e:
+        # Handle any exceptions that may occur during database interaction
+        print(f"Error retrieving data from PostgreSQL database: {str(e)}")
+        return None
+
 
 # landing page
 @app.route("/")
@@ -64,6 +103,7 @@ def welcome():
         f"Available Routes:<br/>"
         f"/api/v1.0/price/<ticker><br/>"
         f"/api/v1.0/stockinfo<br/>"        
+        f"/api/v1.0/stocklist<br/>"
     )
 #Will add  the index later 
 
@@ -80,6 +120,11 @@ def getstockprice(ticker):
    print(type(stockdata))
    return jsonify(stockdata)
    
+@app.route("/api/v1.0/stocklist")
+def getstocklist():
+   stocklist = retrieve_stocklist()
+   print(type(stocklist))
+   return jsonify(stocklist)
 
 
 
