@@ -130,9 +130,10 @@ function optionChanged(selected){
     // need to use .html() instead of .text() to display the <br> correctly
     d3.select("#sample-metadata").html(formattedPI)
     
-    plotChart(jsonData);
-    console.log("before calling candlestick, jsonData: ", jsonData)   
-    plotData(jsonData);
+    drawCharts(jsonData);
+    // plotChart(jsonData);
+    // // console.log("before calling candlestick, jsonData: ", jsonData)   
+    // plotData(jsonData);
   }).catch(function(error) {
     console.log(error);
   });
@@ -152,8 +153,15 @@ function updateChart() {
     console.log('filteredData:',filteredData);
     
     // Use the filtered data to plot the chart
-    plotChart(filteredData);
-    plotData(filteredData);   
+    drawCharts(filteredData);
+    // plotChart(filteredData);
+    // plotData(filteredData);   
+}
+
+function drawCharts(data){
+    plotChart(data);
+    plotData(data);
+    plotVolume(data);
 }
 
 //Helper Functions
@@ -226,7 +234,7 @@ function plotChart(data){
 
     var layout = {
         title: stockName + ' Stock Price Chart',
-        xaxis: { title: 'Date'},
+        // xaxis: { title: 'Date'},
         yaxis: {title: 'Price'}
     };
     Plotly.newPlot('stock-chart', [stockData], layout, {scrollZoom: true});
@@ -266,12 +274,21 @@ function plotData(stockData) {
     var layout ={
         title: stockName + ' Candlestick Chart',
         xaxis: {
-            title: 'Date',
+            // title: 'Date',
             type: 'category',
             type: 'date',
             tickformat: '%Y-%m-%d',
+            //hide the range slider to save space
+            rangeslider: {visible: false}
         },
         yaxis: { title: 'Price'
+        },
+        margin: {
+            l: 50,
+            r: 50,
+            b: 20,
+            t: 50,
+            pad: 4
         },
         //background of area around the plot
         paper_bgcolor: '#f3f3f3',
@@ -283,4 +300,33 @@ function plotData(stockData) {
 
 }
 
+//plotting volume chart
+function plotVolume(data){
+    var dates = cloudbased? data.map(function(record){return record.date}) : data.map(function(record){return record.Date;});
+    var volumes = cloudbased? data.map(function(record){return record.volume}) : data.map(function(record){ return record.Volume;});
+    var colors = data.map(record => (cloudbased? record.close > record.open : record.Close > record.Open) ? 'green' : 'red' );
+    console.log('dates:',dates);
+    console.log('volumes:',volumes);
+    var volumeData = {
+        x: dates,
+        y: volumes,
+        type: 'bar',
+        marker: {color: colors},
+    };
+
+    var layout = {
+        // title: stockName + ' Stock Volume Chart',
+        // xaxis: { title: 'Date'},
+        yaxis: {title: 'Volume'},
+        margin: {
+            l: 50,
+            r: 50,
+            b: 20,
+            t: 50,
+            pad: 4
+        },
+        height: 300
+    };
+    Plotly.newPlot('volume-chart', [volumeData], layout, {scrollZoom: true});
+}
 
