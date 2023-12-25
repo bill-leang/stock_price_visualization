@@ -1,7 +1,8 @@
 /*
  Plotting price charts
  Given the json data from API plot the price chart.
- Data processing: default: show all the data range available.
+ Data processing: 
+   Default: show all the data range available.
    Allow user to Apply a date range, show only the selected range.
 Trace properties: x: date, y: close price
 */
