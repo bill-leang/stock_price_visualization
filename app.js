@@ -321,7 +321,7 @@ function plotVolume(data){
         margin: {
             l: 50,
             r: 50,
-            b: 20,
+            b: 200,
             t: 50,
             pad: 4
         },
