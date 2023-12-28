@@ -46,7 +46,7 @@ understanding of the stock performance. The user can filter by the period they
 are interested in seeing it in more detail. The second tab allows users to
 compare the performances of different stocks in one convenient chart.
 
- **Running the project**  
+ **Running the dashboard**  
    The database is hosted in Neon.tech.
    <ol>
    <li>In a command line terminal, cd into the project folder</li>
