@@ -46,3 +46,16 @@ understanding of the stock performance. The user can filter by the period they
 are interested in seeing it in more detail. The second tab allows users to
 compare the performances of different stocks in one convenient chart.
 
+ **Running the project**  
+   The database is hosted in Neon.tech.
+   <ol>
+   <li>In a command line terminal, cd into the project folder</li>
+   <li>To connect to the database run</li>
+   >python app.py
+    <pre>Open the browser with the url: "localhost:<i>port</i>"</pre>
+   <li>In another command line terminal, cd into the project folderTo run the dashboard </li>
+   >python -m http.server
+   <li>If you run into CORS issue (dashboard doesn't work), you need to install express.js and run the below command </li>
+   >node server.js
+    <pre>Open the browser with the url: "localhost:<i>port</i>"</pre>
+  </ol>
