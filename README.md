@@ -5,18 +5,24 @@
 Neon.tech cloud service. The data is served to the front-end dashboard via a
 Flask API. The front end uses the Plotly library to plot the graphs, which
 converts the data into Plotly traces. Each stock contains at least 1,000
-records, and with a total of ten stocks loaded, we have more than 10,000
+records, and with a total of ten stocks loaded, we have more than 70,000
 records.  
-  <img src="./snapshots/records.png" alt="screenshot of Postgres data count">  
+<div>
+<figure>
+  <img src="./snapshots/records.png" alt="screenshot of Postgres data count">
+  <figcaption>Total number of records: 71,190</figcaption>
+</figure>
+</div>
  &nbsp;&nbsp;  The Postgres DB is accessed via a Flask app, which serves the data to the frontend
 as JSON format through Flask APIs. The frontend dashboard makes use of HTML/CSS
 and JS.  
- 
+
+   
 **Front End**   
  &nbsp;&nbsp; The chosen design is a dashboard page with multiple charts that all reference the
 same data. Besides Plotly.js, we also make use of Bootstrap.js which is not
 covered in class, to simplify formatting of the dashboard.
- 
+   
 **Visualizations**  
 &nbsp;&nbsp;  Our dashboard includes four main views: the price chart, the
 candlestick chart, the volume chart (Stock Info tab) and the comparison chart
@@ -46,7 +52,7 @@ understanding of the stock performance. The user can filter by the period they
 are interested in seeing it in more detail. The second tab allows users to
 compare the performances of different stocks in one convenient chart.
 
- **Running the dashboard**  
+ **Running the Dashboard**  
    The database is hosted in Neon.tech.
    <ol>
    <li>In a command line terminal, cd into the project folder</li>
