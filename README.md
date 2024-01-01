@@ -16,12 +16,13 @@ records.
  &nbsp;&nbsp;  The Postgres DB is accessed via a Flask app, which serves the data to the frontend
 as JSON format through Flask APIs. The frontend dashboard makes use of HTML/CSS
 and JS.  
+
    
 **Front End**   
  &nbsp;&nbsp; The chosen design is a dashboard page with multiple charts that all reference the
 same data. Besides Plotly.js, we also make use of Bootstrap.js which is not
 covered in class, to simplify formatting of the dashboard.
-  
+   
 **Visualizations**  
 &nbsp;&nbsp;  Our dashboard includes four main views: the price chart, the
 candlestick chart, the volume chart (Stock Info tab) and the comparison chart
@@ -51,7 +52,7 @@ understanding of the stock performance. The user can filter by the period they
 are interested in seeing it in more detail. The second tab allows users to
 compare the performances of different stocks in one convenient chart.
 
- **Running the dashboard**  
+ **Running the Dashboard**  
    The database is hosted in Neon.tech.
    <ol>
    <li>In a command line terminal, cd into the project folder</li>
