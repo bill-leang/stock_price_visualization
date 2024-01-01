@@ -131,9 +131,7 @@ function optionChanged(selected){
     d3.select("#sample-metadata").html(formattedPI)
     
     drawCharts(jsonData);
-    // plotChart(jsonData);
-    // // console.log("before calling candlestick, jsonData: ", jsonData)   
-    // plotData(jsonData);
+  
   }).catch(function(error) {
     console.log(error);
   });
@@ -154,8 +152,7 @@ function updateChart() {
     
     // Use the filtered data to plot the chart
     drawCharts(filteredData);
-    // plotChart(filteredData);
-    // plotData(filteredData);   
+ 
 }
 
 function drawCharts(data){
