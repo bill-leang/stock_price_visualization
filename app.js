@@ -81,12 +81,14 @@ function optionAdded(selectElelement){
     
     Promise.all(dataPromises).then(function(stocksData){
         console.log('stocksData:',stocksData);
-        //format the dateStr in the array into JS date
+
+        //if getting data from the cloud, need to format the dateStr in the array into JS date using helper function
         if (cloudbased) {
         for (i=0; i< stocksData.length; i++){
            
                 stocksData[i] = stocksData[i].map(record => {
                     return {
+                        //keep everything in the record, but change the date to JS date
                         ...record,
                         date: getJSDate(record.date)
                     };
@@ -126,9 +128,16 @@ function optionChanged(selected){
     // get the required info from stocklistData array
     let stockInfo = getStockInfo(selectedTicker, stocklistData);
     // convert the object to formatted string using map 
-    formattedPI = Object.keys(stockInfo).map(key => key + ': <strong>' + stockInfo[key] + '</strong><br/>').join('')
+    console.log('stockInfo:',stockInfo);
+    formattedAPI = 'Name' + ': <strong>' + stockInfo['Name'] + '</strong><br/>';
+    //non-destructive looping through the object
+    for (let key in stockInfo) {
+        if (key !== 'Name') {
+            formattedAPI += key + ': <strong>' + stockInfo[key] + '</strong><br/>';
+        }
+    }
     // need to use .html() instead of .text() to display the <br> correctly
-    d3.select("#sample-metadata").html(formattedPI)
+    d3.select("#sample-metadata").html(formattedAPI)
     
     drawCharts(jsonData);
   
@@ -192,12 +201,14 @@ function getStockInfo(name, array) {
 //plot multiple lines on a chart
 function plotMultiCharts(stocksData){
     var colors = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet'];
+    //creating an array of objects that represent each stock
     var data = stocksData.map((stockData,i) => {
         return {
             x: cloudbased? stockData.map(record => record.date) : stockData.map(record => record.Date),
             y: cloudbased? stockData.map(record => record.close) : stockData.map(record => record.Close),
             type: 'scatter',
             mode: 'lines',
+            //stockNames store the names of the stocks selected, will correspond to the stocksData array
             name: stockNames[i],
             marker: {color: colors[i% colors.length]},
         };

@@ -101,7 +101,7 @@ def welcome():
     """List all the available routes"""
     return(
         f"Available Routes:<br/>"
-        f"/api/v1.0/price/<ticker><br/>"
+        f"/api/v1.0/price/&lt;ticker&gt;<br/>"
         f"/api/v1.0/stockinfo<br/>"        
         f"/api/v1.0/stocklist<br/>"
     )
